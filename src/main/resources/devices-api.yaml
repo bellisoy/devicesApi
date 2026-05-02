@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Device API
+  description: API for managing devices (CRUD + filtering)
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /devices:
+    post:
+      summary: Create a new device
+      operationId: createDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRequest'
+      responses:
+        "201":
+          description: Device created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+    get:
+      summary: Fetch all devices
+      operationId: getAllDevices
+      responses:
+        "200":
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+  /devices/{id}:
+    get:
+      summary: Fetch a single device
+      operationId: getDeviceById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Device found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+    patch:
+      summary: Update a device
+      operationId: updateDevice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateRequest'
+      responses:
+        "200":
+          description: Device updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+    delete:
+      summary: Delete a device
+      operationId: deleteDevice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Device deleted
+
+  /devices/brand/{brand}:
+    get:
+      summary: Fetch devices by brand
+      operationId: getDevicesByBrand
+      parameters:
+        - name: brand
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Devices by brand
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+  /devices/state/{state}:
+    get:
+      summary: Fetch devices by state
+      operationId: getDevicesByState
+      parameters:
+        - name: state
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/DeviceState'
+      responses:
+        "200":
+          description: Devices by state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+
+components:
+
+  schemas:
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "d1"
+        name:
+          type: string
+          example: "iPhone 15"
+        brand:
+          type: string
+          example: "Apple"
+        state:
+          $ref: '#/components/schemas/DeviceState'
+        creationTime:
+          type: string
+          format: date-time
+          example: "2026-05-01T10:15:30Z"
+
+    DeviceRequest:
+      type: object
+      required:
+        - name
+        - brand
+        - state
+      properties:
+        name:
+          type: string
+        brand:
+          type: string
+        state:
+          $ref: '#/components/schemas/DeviceState'
+
+    DeviceUpdateRequest:
+      type: object
+      description: Update all or some fields except creation time
+      properties:
+        name:
+          type: string
+        brand:
+          type: string
+        state:
+          $ref: '#/components/schemas/DeviceState'
+
+    DeviceState:
+      type: string
+      enum:
+        - AVAILABLE
+        - IN_USE
+        - INACTIVE
