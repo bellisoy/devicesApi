@@ -232,13 +232,6 @@ class DeviceServiceTest {
                 .state(DeviceState.AVAILABLE)
                 .build();
 
-        DeviceEntity d2 = DeviceEntity.builder()
-                .id("id2")
-                .name("B")
-                .brand("Samsung")
-                .state(DeviceState.AVAILABLE)
-                .build();
-
         when(repository.findByBrand("Apple")).thenReturn(List.of(d1));
 
         List<Device> result = service.getDevicesByBrand("Apple");
@@ -256,13 +249,6 @@ class DeviceServiceTest {
                 .name("A")
                 .brand("Apple")
                 .state(DeviceState.IN_USE)
-                .build();
-
-        DeviceEntity d2 = DeviceEntity.builder()
-                .id("id2")
-                .name("B")
-                .brand("Samsung")
-                .state(DeviceState.AVAILABLE)
                 .build();
 
         when(repository.findByState(DeviceState.IN_USE)).thenReturn(List.of(d1));

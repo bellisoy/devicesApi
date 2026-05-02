@@ -26,6 +26,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+        "400":
+          description: Invalid request body
 
     get:
       summary: Fetch all devices
@@ -57,6 +59,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+        "404":
+          description: Device not found
 
     patch:
       summary: Update a device
@@ -80,6 +84,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+        "400":
+          description: Invalid update request
+        "404":
+          description: Device not found
 
     delete:
       summary: Delete a device
@@ -93,6 +101,17 @@ paths:
       responses:
         "204":
           description: Device deleted
+        "409":
+          description: Device is in use and cannot be deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Device not found
 
   /devices/brand/{brand}:
     get:
@@ -133,6 +152,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Device'
+        "400":
+          description: Invalid state value
 
 components:
 
