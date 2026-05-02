@@ -1,6 +1,8 @@
 package com.example.devicesApi.devicesApi.controller;
 
 import com.example.devicesApi.api.DevicesApi;
+import com.example.devicesApi.devicesApi.entity.DeviceEntity;
+import com.example.devicesApi.devicesApi.mapper.DeviceMapper;
 import com.example.devicesApi.devicesApi.service.DeviceService;
 import com.example.devicesApi.model.Device;
 import com.example.devicesApi.model.DeviceRequest;
@@ -23,8 +25,8 @@ public class DeviceController implements DevicesApi {
 
     @Override
     public ResponseEntity<Device> createDevice(DeviceRequest deviceRequest) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
-
+        DeviceEntity saved = service.create(deviceRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(DeviceMapper.toDto(saved));
     }
 
     @Override
@@ -35,13 +37,15 @@ public class DeviceController implements DevicesApi {
 
     @Override
     public ResponseEntity<List<Device>> getAllDevices() {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        List<Device> result = service.getAll().stream()
+                .map(DeviceMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 
     @Override
     public ResponseEntity<Device> updateDevice(String id, DeviceUpdateRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
-
     }
 
     @Override
