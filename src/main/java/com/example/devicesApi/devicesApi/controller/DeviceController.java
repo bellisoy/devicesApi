@@ -8,6 +8,7 @@ import com.example.devicesApi.model.Device;
 import com.example.devicesApi.model.DeviceRequest;
 import com.example.devicesApi.model.DeviceState;
 import com.example.devicesApi.model.DeviceUpdateRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,13 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class DeviceController implements DevicesApi {
 
     private final DeviceService service;
 
-    public DeviceController(DeviceService service) {
-        this.service = service;
-    }
 
     @Override
     public ResponseEntity<Device> createDevice(DeviceRequest deviceRequest) {
@@ -57,11 +56,17 @@ public class DeviceController implements DevicesApi {
 
     @Override
     public ResponseEntity<List<Device>> getDevicesByBrand(String brand) {
-        return ResponseEntity.ok(service.getDevicesByBrand(brand));
+        return ResponseEntity.ok(service.getDevicesByBrand(brand)
+                .stream()
+                .map(DeviceMapper::toDto)
+                .toList());
     }
 
     @Override
     public ResponseEntity<List<Device>> getDevicesByState(DeviceState state) {
-        return ResponseEntity.ok(service.getDevicesByState(state));
+        return ResponseEntity.ok(service.getDevicesByState(state)
+                .stream()
+                .map(DeviceMapper::toDto)
+                .toList());
     }
 }

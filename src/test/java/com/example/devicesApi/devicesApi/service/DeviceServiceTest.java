@@ -5,7 +5,6 @@ import com.example.devicesApi.devicesApi.entity.DeviceEntity;
 import com.example.devicesApi.devicesApi.exceptions.DeviceInUseException;
 import com.example.devicesApi.devicesApi.exceptions.DeviceNotFoundException;
 import com.example.devicesApi.devicesApi.repository.DeviceRepository;
-import com.example.devicesApi.model.Device;
 import com.example.devicesApi.model.DeviceRequest;
 import com.example.devicesApi.model.DeviceState;
 import com.example.devicesApi.model.DeviceUpdateRequest;
@@ -234,13 +233,14 @@ class DeviceServiceTest {
 
         when(repository.findByBrand("Apple")).thenReturn(List.of(d1));
 
-        List<Device> result = service.getDevicesByBrand("Apple");
+        List<DeviceEntity> result = service.getDevicesByBrand("Apple");
 
         assertEquals(1, result.size());
         assertEquals("Apple", result.getFirst().getBrand());
 
         verify(repository).findByBrand("Apple");
     }
+
 
     @Test
     void getDevicesByState_shouldReturnFilteredDevices() {
@@ -253,7 +253,7 @@ class DeviceServiceTest {
 
         when(repository.findByState(DeviceState.IN_USE)).thenReturn(List.of(d1));
 
-        List<Device> result = service.getDevicesByState(DeviceState.IN_USE);
+        List<DeviceEntity> result = service.getDevicesByState(DeviceState.IN_USE);
 
         assertEquals(1, result.size());
         assertEquals(DeviceState.IN_USE, result.getFirst().getState());

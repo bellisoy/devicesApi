@@ -3,25 +3,21 @@ package com.example.devicesApi.devicesApi.service;
 import com.example.devicesApi.devicesApi.entity.DeviceEntity;
 import com.example.devicesApi.devicesApi.exceptions.DeviceInUseException;
 import com.example.devicesApi.devicesApi.exceptions.DeviceNotFoundException;
-import com.example.devicesApi.devicesApi.mapper.DeviceMapper;
 import com.example.devicesApi.devicesApi.repository.DeviceRepository;
-import com.example.devicesApi.model.Device;
 import com.example.devicesApi.model.DeviceRequest;
 import com.example.devicesApi.model.DeviceState;
 import com.example.devicesApi.model.DeviceUpdateRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DeviceService {
 
     private final DeviceRepository repository;
-
-    public DeviceService(DeviceRepository repository) {
-        this.repository = repository;
-    }
 
     public DeviceEntity create(DeviceRequest request) {
         DeviceEntity entity = DeviceEntity.builder()
@@ -70,18 +66,12 @@ public class DeviceService {
         repository.deleteById(id);
     }
 
-    public List<Device> getDevicesByBrand(String brand) {
-        return repository.findByBrand(brand)
-                .stream()
-                .map(DeviceMapper::toDto)
-                .toList();
+    public List<DeviceEntity> getDevicesByBrand(String brand) {
+        return repository.findByBrand(brand);
     }
 
-    public List<Device> getDevicesByState(DeviceState state) {
-        return repository.findByState(state)
-                .stream()
-                .map(DeviceMapper::toDto)
-                .toList();
+    public List<DeviceEntity> getDevicesByState(DeviceState state) {
+        return repository.findByState(state);
     }
 
     private void checkUpdatable(DeviceEntity entity, DeviceUpdateRequest request) {
