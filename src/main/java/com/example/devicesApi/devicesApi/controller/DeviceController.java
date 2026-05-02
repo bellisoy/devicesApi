@@ -31,8 +31,8 @@ public class DeviceController implements DevicesApi {
 
     @Override
     public ResponseEntity<Device> getDeviceById(String id) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
-
+        DeviceEntity entity = service.getById(id);
+        return ResponseEntity.ok(DeviceMapper.toDto(entity));
     }
 
     @Override
@@ -45,21 +45,23 @@ public class DeviceController implements DevicesApi {
 
     @Override
     public ResponseEntity<Device> updateDevice(String id, DeviceUpdateRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        DeviceEntity updated = service.update(id, request);
+        return ResponseEntity.ok(DeviceMapper.toDto(updated));
     }
 
     @Override
     public ResponseEntity<Void> deleteDevice(String id) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<List<Device>> getDevicesByBrand(String brand) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        return ResponseEntity.ok(service.getDevicesByBrand(brand));
     }
 
     @Override
     public ResponseEntity<List<Device>> getDevicesByState(DeviceState state) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        return ResponseEntity.ok(service.getDevicesByState(state));
     }
 }

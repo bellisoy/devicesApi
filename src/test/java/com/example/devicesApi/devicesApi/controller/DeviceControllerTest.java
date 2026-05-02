@@ -6,12 +6,14 @@ import com.example.devicesApi.devicesApi.service.DeviceService;
 import com.example.devicesApi.model.Device;
 import com.example.devicesApi.model.DeviceRequest;
 import com.example.devicesApi.model.DeviceState;
+import com.example.devicesApi.model.DeviceUpdateRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.OffsetDateTime;
@@ -19,8 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -80,9 +81,105 @@ class DeviceControllerTest {
 
         ResponseEntity<List<Device>> response = controller.getAllDevices();
 
-        assertEquals(200, response.getStatusCode().is2xxSuccessful());
+        assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertNotNull(response.getBody());
         assertEquals(2, response.getBody().size());
         verify(service).getAll();
+    }
+
+    @Test
+    void getDeviceById_shouldReturnDevice() {
+        DeviceEntity entity = DeviceEntity.builder()
+                .id("id1")
+                .name("Galaxy S24")
+                .brand("Samsung")
+                .state(DeviceState.AVAILABLE)
+                .creationTime(OffsetDateTime.now())
+                .build();
+
+        when(service.getById("id1")).thenReturn(entity);
+
+        ResponseEntity<Device> response = controller.getDeviceById("id1");
+
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        Assertions.assertNotNull(response.getBody());
+        assertEquals("Galaxy S24", response.getBody().getName());
+        verify(service).getById("id1");
+    }
+
+    @Test
+    void updateDevicePartial_shouldDelegateToService() {
+        DeviceUpdateRequest request = DeviceUpdateRequest.builder()
+                .name("NewName")
+                .brand("NewBrand")
+                .build();
+
+        DeviceEntity updated = DeviceEntity.builder()
+                .id("id1")
+                .name("NewName")
+                .brand("NewBrand")
+                .state(DeviceState.AVAILABLE)
+                .creationTime(OffsetDateTime.now())
+                .build();
+
+        when(service.update("id1", request)).thenReturn(updated);
+
+        ResponseEntity<Device> response = controller.updateDevice("id1", request);
+
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        Assertions.assertNotNull(response.getBody());
+        assertEquals("NewName", response.getBody().getName());
+        verify(service).update("id1", request);
+    }
+
+    @Test
+    void deleteDevice_shouldDelegateToService() {
+        doNothing().when(service).delete("id1");
+
+        ResponseEntity<Void> response = controller.deleteDevice("id1");
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(service).delete("id1");
+    }
+
+    @Test
+    void getDevicesByBrand_shouldReturnFilteredDevices() {
+        Device d1 = Device.builder()
+                .id("id1")
+                .name("A")
+                .brand("Apple")
+                .state(DeviceState.AVAILABLE)
+                .build();
+
+        when(service.getDevicesByBrand("Apple")).thenReturn(List.of(d1));
+
+        ResponseEntity<List<Device>> response = controller.getDevicesByBrand("Apple");
+
+        Assertions.assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Apple", response.getBody().getFirst().getBrand());
+
+        verify(service).getDevicesByBrand("Apple");
+    }
+
+    @Test
+    void getDevicesByState_shouldReturnFilteredDevices() {
+        Device d1 = Device.builder()
+                .id("id1")
+                .name("A")
+                .brand("Apple")
+                .state(DeviceState.IN_USE)
+                .build();
+
+        when(service.getDevicesByState(DeviceState.IN_USE))
+                .thenReturn(List.of(d1));
+
+        ResponseEntity<List<Device>> response = controller.getDevicesByState(DeviceState.IN_USE);
+
+        Assertions.assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals(DeviceState.IN_USE, response.getBody().getFirst().getState());
+
+        verify(service).getDevicesByState(DeviceState.IN_USE);
     }
 }
